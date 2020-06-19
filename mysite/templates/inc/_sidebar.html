@@ -1,0 +1,15 @@
+{% load news_tags %}
+{% comment %}
+<!--подключаем наш тег new_tags, потом вызываем функцию get_categories-->
+<div class="list-group">
+    {% get_list_categories as categories %}
+    {% for item in categories %}
+    <a href="{% url 'category' item.pk %}" class="list-group-item list-group-item-action">{{ item.title }}</a>
+    {% endfor %}
+</div>
+
+<br>
+
+{% endcomment %}
+
+{% show_categories %}
