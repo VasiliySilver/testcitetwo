@@ -1523,10 +1523,35 @@ from django.shortcuts import render, get_object_or_404, redirect
                 # news = News.objects.create(**form.cleaned_data) # распаковка словарей используется две звездочки (**)
                 news = form.save()
 
+# Урок 26 | Кастомные валидаторы
+=====================================
+
+>news/forms.py
+
+                #импортируем регулярные выражения
+                import re
+                #импортируем валидатор
+                from django.core.exceptions import ValidationError
+       
+ - создаем в Meta проверку валидности поля tilte
+ 
+ 
+                def clean_title(self):
+                   title = self.cleaned_data['tilte']
+                   if re.match(r'\d', title):
+                       raise ValueError('Название не должно начинаться с цифры')
+                   return title
+
+>static/style.css
+
+- выводим ошибку валидации красным (пока не работает)
 
 
-            
+                .errorlist{
+                    color: red;
+                }
 
-
+# Урок 27 | Класс ListView. Часть 1
+=====================================
 
 
