@@ -1486,7 +1486,7 @@ from django.shortcuts import render, get_object_or_404, redirect
                     return render(request, 'news/add_news.html', {"form": form})
 
 
-# Урок 23 | Работа с формами. Часть 3
+# Урок 25 | Работа с формами. Часть 3
 =====================================
 
 - изменяем форму для более быстрого создания
@@ -1553,5 +1553,96 @@ from django.shortcuts import render, get_object_or_404, redirect
 
 # Урок 27 | Класс ListView. Часть 1
 =====================================
+
+- ListView более удобный способ представления данных в контроллерах и маршрутизаторах
+
+
+>news/views.py
+
+                from django.views.generic import ListView
+
+                class HomeNews(ListView):
+                    """
+                    С помощью класса List View заменяем Index
+                    model - получаем список всех новостей
+                    template_name - устанавливаем нужную нам страницу
+                    get_context_data - присваем нужные нам значения в context
+                    get_queryset -  получаем нужный нам отфильтрованный набор объектов
+                    """
+                    model = News
+                    template_name = 'news/home_news_list.html'
+                    context_object_name = 'news'
+                    # extra_context = {'title': 'Главная'}
+                    
+                    def get_context_data(self, *, object_list=None, **kwargs):
+                        context = super(HomeNews, self).get_context_data(**kwargs)
+                        context['title'] = 'Главная страница'
+                        return context
+                
+                    def get_queryset(self):
+                        return News.objects.filter(is_published=True)
+
+
+- далее прописываем маршрут
+>news/urls.py
+
+                # path('', index, name='home'),
+                path('', HomeNews.as_view(), name='home'),
+
+- ViewList автоматически ротится на страницу news_list.html
+- так же во ViewList есть свойсто template_name куда можно передать название нашей страницы
+
+- создадим страницу которую прописали в свойстве
+- и перенесём сюда страницу index
+
+- так же нужно указать context_object_name = 'news'
+
+                {% for item in news %}
+                
+- инначе его значением будет object_list
+
+                {% for item in object_list %}
+
+> template_name = 'news/home_news_list.html'
+>templates/news/home_news_list.html
+
+                {% extends 'base.html' %}
+                
+                {% block title %}
+                {{ title }} :: {{ block.super }}
+                {% endblock %}
+                
+                {% block sidebar %}
+                {% include 'inc/_sidebar.html' %}
+                {% endblock %}
+                
+                {% block content %}
+                {% for item in news %}
+                <div class="card mb-3">
+                    <div class="card-header">
+                        Категория: <a href="{{ item.category.get_absolute_url }}">{{ item.category }}</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="media">
+                            {% if item.photo %}
+                            <img src="{{ item.photo.url }}" alt="" width="350" class="mr-3">
+                            {% else %}
+                            <img src="https://picsum.photos/id/1060/350/235/?blur=2" alt="" class="mr-3">
+                            {% endif %}
+                            <div class="media-body">
+                                <h5 class="card-title">{{ item.title }}</h5>
+                                <p class="card-text">{{ item.content|safe|linebreaks|truncatewords:50 }}</p>
+                                <a href="{{ item.get_absolute_url }}" class="btn btn-primary">Read more...</a>
+                            </div>
+                        </div>
+                
+                    </div>
+                    <div class="card-footer text-muted">
+                        {{ item.created_at|date:"Y-m-d H:i:s" }}
+                    </div>
+                </div>
+                {% endfor %}
+                {% endblock %}
+
 
 
