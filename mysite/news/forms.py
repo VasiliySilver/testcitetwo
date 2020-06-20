@@ -23,7 +23,7 @@ class NewsForm(forms.ModelForm):
     def clean_title(self):
         title = self.cleaned_data('tilte')
         if re.match(r'\d', title):
-            raise ValueError('Название не должно начинаться с цифры')
+            raise ValidationError('Название не должно начинаться с цифры')
         return title
 
 
