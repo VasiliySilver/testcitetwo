@@ -1,7 +1,7 @@
 from django import forms
 from .models import News
 
-# ниже форма связанная с моделями
+# ниже на 55 сторчке - форма связанная с моделями
 
 class NewsForm(forms.ModelForm):
     class Meta:
@@ -9,6 +9,7 @@ class NewsForm(forms.ModelForm):
         model = News
         # fields = '__all__'  # здесь указываются поля в нашей форме
         # лучше описать явно поля
+        # перечисляем поля которые нам необходимы
         fields = ['title', 'content', 'is_published', 'category']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
