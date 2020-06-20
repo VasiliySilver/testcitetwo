@@ -1,5 +1,9 @@
 from django import forms
 from .models import News
+#импортируем регулярные выражения
+import re
+#импортируем валидатор
+from django.core.exceptions import ValidationError
 
 # ниже на 55 сторчке - форма связанная с моделями
 
@@ -16,6 +20,12 @@ class NewsForm(forms.ModelForm):
             'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
             'category': forms.Select(attrs={'class': 'form-control'})
         }
+    def clean_title(self):
+        title = self.cleaned_data('tilte')
+        if re.match(r'\d', title):
+            raise ValueError('Название не должно начинаться с цифры')
+        return title
+
 
 
 
