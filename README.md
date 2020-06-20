@@ -19,6 +19,151 @@ source venv/bin/activate
 # Урок 3 | Установка Django
 ====================================
 
+###### перед установкой django добавим .gitignore
+
+                # Byte-compiled / optimized / DLL files
+                __pycache__/
+                *.py[cod]
+                *$py.class
+                
+                # C extensions
+                *.so
+                
+                # Distribution / packaging
+                .Python
+                build/
+                develop-eggs/
+                dist/
+                downloads/
+                eggs/
+                .eggs/
+                lib/
+                lib64/
+                parts/
+                sdist/
+                var/
+                wheels/
+                share/python-wheels/
+                *.egg-info/
+                .installed.cfg
+                *.egg
+                MANIFEST
+                
+                # PyInstaller
+                #  Usually these files are written by a python script from a template
+                #  before PyInstaller builds the exe, so as to inject date/other infos into it.
+                *.manifest
+                *.spec
+                
+                # Installer logs
+                pip-log.txt
+                pip-delete-this-directory.txt
+                
+                # Unit test / coverage reports
+                htmlcov/
+                .tox/
+                .nox/
+                .coverage
+                .coverage.*
+                .cache
+                nosetests.xml
+                coverage.xml
+                *.cover
+                *.py,cover
+                .hypothesis/
+                .pytest_cache/
+                cover/
+                
+                # Translations
+                *.mo
+                *.pot
+                
+                # Django stuff:
+                *.log
+                local_settings.py
+                db.sqlite3
+                db.sqlite3-journal
+                
+                # Flask stuff:
+                instance/
+                .webassets-cache
+                
+                # Scrapy stuff:
+                .scrapy
+                
+                # Sphinx documentation
+                docs/_build/
+                
+                # PyBuilder
+                .pybuilder/
+                target/
+                
+                # Jupyter Notebook
+                .ipynb_checkpoints
+                
+                # IPython
+                profile_default/
+                ipython_config.py
+                
+                # pyenv
+                #   For a library or package, you might want to ignore these files since the code is
+                #   intended to run in multiple environments; otherwise, check them in:
+                # .python-version
+                
+                # pipenv
+                #   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+                #   However, in case of collaboration, if having platform-specific dependencies or dependencies
+                #   having no cross-platform support, pipenv may install dependencies that don't work, or not
+                #   install all needed dependencies.
+                #Pipfile.lock
+                
+                # PEP 582; used by e.g. github.com/David-OConnor/pyflow
+                __pypackages__/
+                
+                # Celery stuff
+                celerybeat-schedule
+                celerybeat.pid
+                
+                # SageMath parsed files
+                *.sage.py
+                
+                # Environments
+                .env
+                .venv
+                env/
+                venv/
+                ENV/
+                env.bak/
+                venv.bak/
+                
+                # Spyder project settings
+                .spyderproject
+                .spyproject
+                
+                # Rope project settings
+                .ropeproject
+                
+                # mkdocs documentation
+                /site
+                
+                # mypy
+                .mypy_cache/
+                .dmypy.json
+                dmypy.json
+                
+                # Pyre type checker
+                .pyre/
+                
+                # pytype static type analyzer
+                .pytype/
+                
+                # Cython debug symbols
+                cython_debug/
+                
+                .idea/
+
+
+
 pip install Django
 
 django-admin startproject mysite
@@ -26,7 +171,6 @@ django-admin startproject mysite
 python manage.py runserver
 python manage.py runserver 4000
 python manage.py runserver 1.2.3.4:4000
-
 
 
 # Урок 4 | Приложения в Django
@@ -1344,4 +1488,45 @@ from django.shortcuts import render, get_object_or_404, redirect
 
 # Урок 23 | Работа с формами. Часть 3
 =====================================
+
+- изменяем форму для более быстрого создания
+- в классе meta выбираем нужные нам поля
+- в виджетах создаем form-control для более удобного отображения
+
+>forms.py
+
+                class NewsForm(forms.ModelForm):
+                    class Meta:
+                        """можно использовать __all__ чтобы добавить сразу все поля, create_at и updated_at заполняются автоматически"""
+                        model = News
+                        # fields = '__all__'  # здесь указываются поля в нашей форме
+                        # лучше описать явно поля
+                        # перечисляем поля которые нам необходимы
+                        fields = ['title', 'content', 'is_published', 'category']
+                        widgets = {
+                            'title': forms.TextInput(attrs={'class': 'form-control'}),
+                            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+                            'category': forms.Select(attrs={'class': 'form-control'})
+                        }
+
+- дальше в моделях у категорий уберем null=True
+
+                category = models.ForeignKey('Category', on_delete=models.PROTECT, blank=True, verbose_name='Категория')
+
+- потом создадим миграцию
+- py manage.py makemigrations
+- и применим ее
+- py manage.py migrate
+
+- в файле views.py добавим более легкий способ сохранения формы news = form.save(
+
+                # news = News.objects.create(**form.cleaned_data) # распаковка словарей используется две звездочки (**)
+                news = form.save()
+
+
+
+            
+
+
+
 
