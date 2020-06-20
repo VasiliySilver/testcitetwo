@@ -28,7 +28,8 @@ def add_news(request):
             # print(form.cleaned_data) # если данные прошли валидацию данные попадают в словарь clean_data
             # title = form.cleaned_data('tilte') # неудобный способ
             # News.objects.create(title=title) # неудобный способ
-            news = News.objects.create(**form.cleaned_data) # распаковка словарей используется две звездочки (**)
+            # news = News.objects.create(**form.cleaned_data) # распаковка словарей используется две звездочки (**)
+            news = form.save()
             return redirect(news)
     else:
         form = NewsForm()
