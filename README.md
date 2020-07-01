@@ -1646,3 +1646,139 @@ from django.shortcuts import render, get_object_or_404, redirect
 
 
 
+
+# Урок 28 | Класс ListView. Часть 2
+=====================================
+
+##### Маршрутизация категорий
+
+- перепишем метод категорий
+
+>news/views.py
+
+                class NewsByCategory(ListView):
+                    model = News
+                    template_name = 'news/home_news_list.html'
+                    context_object_name = 'news'
+                    allow_empty = False  # запрещаем показ пустых списков
+                
+                    def get_context_data(self, *, object_list=None, **kwargs):
+                        context = super().get_context_data(**kwargs)
+                        context['title'] = Category.objects.get(pk=self.kwargs['category_id'])
+                        return context
+                
+                    def get_queryset(self):
+                        return News.objects.filter(category_id=self.kwargs['category_id'], is_published=True)
+
+
+
+- добавим маршрутизацию
+
+>news/utls.py
+
+                    # path('category/<int:category_id>/', get_category, name='category'),
+                    path('category/<int:category_id>/', NewsByCategory.as_view(extra_context={'title': 'Какой-то тайтл'}), name='category'),
+
+- изменим шаблон отображения новостей view-news.html уберем блок media
+>view-news.html
+
+                {% extends 'base.html' %}
+                
+                {% block title %}
+                  {{ news_item.title }} :: {{ block.super }}
+                {% endblock %}
+                
+                {% block sidebar %}
+                  {% include 'inc/_sidebar.html' %}
+                {% endblock %}
+                
+                {% block content %}
+                  <div class="card mb-3">
+                    <div class="card-header">
+                      Категория: <a href="{{ news_item.category.get_absolute_url }}">{{ news_item.category }}</a>
+                    </div>
+                    <div class="card-body">
+                
+                      {% if item.photo %}
+                        <img src="{{ news_itme.photo.url }}" alt="" width="350" class="float-left mr-3">
+                      {% else %}
+                        <img src="https://picsum.photos/id/1060/350/235/?blur=2" alt="" class="mr-3">
+                      {% endif %}
+                
+                      <h5 class="card-title">{{ news_item.title }}</h5>
+                      <p class="card-text">{{ news_item.content|safe|linebreaks }}</p>
+                
+                
+                    </div>
+                    <div class="card-footer text-muted">
+                      {{ news_item.created_at|date:"Y-m-d H:i:s" }}
+                    </div>
+                  </div>
+                
+                {% endblock %}
+
+
+
+# Урок 29 | Класс DetailView
+=====================================
+
+- перепишем метод view_news
+
+>news/views.py
+
+                 class ViewNews(DetailView):
+                    model = News
+                    context_object_name = 'news_item'
+                    # pk_url_kwarg = 'news_id'
+                    # template_name = 'news/news_detail.html'
+
+- пропишем новый путь
+>news/utls.py
+- в модели будем обращаться по ключу pk 
+
+                   # path('news/<int:news_id>/', view_news, name='view_news'),
+                    path('news/<int:pk>/', ViewNews.as_view(), name='view_news'),
+
+- в модели будем обращаться по ключу pk
+>создаем файл >news-detail.html
+- переносим сюда шаблон view-news.html
+
+                {% extends 'base.html' %}
+                
+                {% block title %}
+                  {{ news_item.title }} :: {{ block.super }}
+                {% endblock %}
+                
+                {% block sidebar %}
+                  {% include 'inc/_sidebar.html' %}
+                {% endblock %}
+                
+                {% block content %}
+                  <div class="card mb-3">
+                    <div class="card-header">
+                      Категория: <a href="{{ news_item.category.get_absolute_url }}">{{ news_item.category }}</a>
+                    </div>
+                    <div class="card-body">
+                
+                      {% if item.photo %}
+                        <img src="{{ news_itme.photo.url }}" alt="" width="350" class="float-left mr-3">
+                      {% else %}
+                        <img src="https://picsum.photos/id/1060/350/235/?blur=2" alt="" class="mr-3">
+                      {% endif %}
+                
+                      <h5 class="card-title">{{ news_item.title }}</h5>
+                      <p class="card-text">{{ news_item.content|safe|linebreaks }}</p>
+                
+                
+                    </div>
+                    <div class="card-footer text-muted">
+                      {{ news_item.created_at|date:"Y-m-d H:i:s" }}
+                    </div>
+                  </div>
+                
+                {% endblock %}
+
+
+# Урок 30 | Класс CreateVIew
+=====================================
+
